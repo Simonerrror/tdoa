@@ -27,15 +27,17 @@ def loss_fn(flat_xyz, points, tdoa):
     return loss
 
 def solve_with_minimize(points, tdoa):
-    # Стартовая инициализация (6 переменных: Ax, Ay, Bx, By, Cx, Cy)
-    x0 = np.random.randn(6)
-
+    center = np.mean([points['D'], points['E'], points['F']], axis=0)
+    x0 = np.concatenate([
+        center + np.random.randn(2) * 0.5,  # A
+        center + np.random.randn(2) * 0.5,  # B
+        center + np.random.randn(2) * 0.5   # C
+    ])
     res = minimize(loss_fn, x0, args=(points, tdoa), method='L-BFGS-B')
 
-    A = res.x[0:2]
-    B = res.x[2:4]
-    C = res.x[4:6]
-
+    A = np.round(res.x[0:2], 2)
+    B = np.round(res.x[2:4], 2)
+    C = np.round(res.x[4:6], 2)
     return A, B, C, res
 
 if __name__ == "__main__":
@@ -48,3 +50,8 @@ if __name__ == "__main__":
     print("B =", B)
     print("C =", C)
     print(f"Loss: {res.fun:.6f}, Success: {res.success}")
+    
+    print("\n[ORIGINAL] Истинные координаты:")
+    print("A =", np.round(points['A'], 2))
+    print("B =", np.round(points['B'], 2))
+    print("C =", np.round(points['C'], 2))
