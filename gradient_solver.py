@@ -72,3 +72,18 @@ def grad_descent(points, tdoa, lr=0.01, epochs=1000):
             print(f"iter {i}: loss = {loss:.6f}")
 
     return A, B, C
+
+
+if __name__ == "__main__":
+    points, tdoa = generate_data()
+    A_hat, B_hat, C_hat = grad_descent(points, tdoa)
+
+    print("\nОценённые координаты:")
+    print("A =", A_hat)
+    print("B =", B_hat)
+    print("C =", C_hat)
+
+    print("\nНастоящие координаты:")
+    print("A =", points['A'])
+    print("B =", points['B'])
+    print("C =", points['C'])
