@@ -20,11 +20,13 @@ def loss_fn(A, B, C, points, tdoa):
 
     return loss
 
-def grad_descent(points, tdoa, lr=0.01, epochs=1000):
-    # Инициализация (случайно)
-    A = np.random.randn(2)
-    B = np.random.randn(2)
-    C = np.random.randn(2)
+def grad_descent(points, tdoa, lr=0.05, epochs=10000, tol=1e-8, decay_every=1000, decay_rate=0.5):
+    center = np.mean([points['D'], points['E'], points['F']], axis=0)
+    A = center + np.random.randn(2) * 0.5
+    B = center + np.random.randn(2) * 0.5
+    C = center + np.random.randn(2) * 0.5
+
+    prev_loss = None
 
     for i in range(epochs):
         grad_A = np.zeros(2)
@@ -42,8 +44,6 @@ def grad_descent(points, tdoa, lr=0.01, epochs=1000):
             distA = np.linalg.norm(dA)
             distB = np.linalg.norm(dB)
             distC = np.linalg.norm(dC)
-
-            # avoid division by zero
             eps = 1e-8
 
             # AB
@@ -68,8 +68,21 @@ def grad_descent(points, tdoa, lr=0.01, epochs=1000):
         B -= lr * grad_B
         C -= lr * grad_C
 
+        # Печать каждые 100 итераций
         if i % 100 == 0:
-            print(f"iter {i}: loss = {loss:.6f}")
+            print(f"iter {i}: loss = {loss:.10f}")
+
+        # Early stopping
+        if prev_loss is not None and abs(prev_loss - loss) < tol:
+            print(f"Early stopping at iter {i}, Δloss = {abs(prev_loss - loss):.2e}")
+            break
+
+        # Decay learning rate
+        if i % decay_every == 0 and i > 0:
+            lr *= decay_rate
+            print(f"[{i}] learning rate decayed to {lr:.5f}")
+
+        prev_loss = loss
 
     return A, B, C
 
