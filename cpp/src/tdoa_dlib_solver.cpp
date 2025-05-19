@@ -67,8 +67,7 @@ dlib::matrix<double, 6, 1> solve_tdoa_dlib(const TDOASet& tdoa, const SourceSet&
         bfgs_search_strategy(),
         objective_delta_stop_strategy(1e-9),
         loss,
-        x,
-        -1 // minimize
+        x
     );
 
     return x;
